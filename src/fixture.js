@@ -2,7 +2,7 @@ export default [
   [{ value: "" }, { value: "" }, { value: "" }, { value: "" }],
   [
     { value: "Quality Inspection" },
-    { value: "" },
+    { value: "", colSpan: 2 },
     { value: "" },
     { value: "" }
   ],

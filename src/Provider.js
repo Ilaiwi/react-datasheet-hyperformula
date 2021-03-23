@@ -1,16 +1,16 @@
-import React, { createContext, useEffect, useRef } from "react";
+import React, { createContext, useEffect, useRef, useState } from "react";
 import HyperFormula from "hyperformula";
 import { useUpdate } from "react-use";
 
 export const Context = createContext({
   data: [],
   onDataChange: () => {},
-  dimensions: { width: 0, height: 0 }
+  dimensions: { width: 0, height: 0 },
 });
 
 const options = {
   precisionRounding: 4,
-  licenseKey: "agpl-v3"
+  licenseKey: "agpl-v3",
 };
 
 function buildHf(data, options) {
@@ -20,25 +20,32 @@ function buildHf(data, options) {
   );
 }
 
-function getHfValues(hf) {
+function getHfValues(hf, meta) {
   const calculated = hf.getSheetValues(0);
   const formulas = hf.getSheetFormulas(0);
   return calculated.map((y, yIndex) =>
     y.map((x, xIndex) => {
-      return { expr: formulas[yIndex][xIndex], value: x };
+      return {
+        expr: formulas[yIndex][xIndex],
+        value: x,
+        ...(meta[yIndex][xIndex] || {}),
+      };
     })
   );
 }
 
 const Provider = ({ initData = [], children }) => {
+  const [meta, setMeta] = useState(
+    initData.map((i) => i.map(({ value, expr, ...meta }) => meta))
+  );
   const forceUpdate = useUpdate();
   const hfRef = useRef(buildHf(initData, options));
-  const data = getHfValues(hfRef.current);
+  const data = getHfValues(hfRef.current, meta);
   const handleCellsChanged = (changes) => {
     hfRef.current.batch(() => {
       changes.forEach(({ row, col, value }) => {
         hfRef.current.setCellContents({ col: col, row: row, sheet: 0 }, [
-          [value]
+          [value],
         ]);
       });
     });
@@ -51,7 +58,7 @@ const Provider = ({ initData = [], children }) => {
       value={{
         data: data,
         onCellsChanged: handleCellsChanged,
-        dimensions: hfRef.current.getSheetDimensions(0)
+        dimensions: hfRef.current.getSheetDimensions(0),
       }}
     >
       {children}
