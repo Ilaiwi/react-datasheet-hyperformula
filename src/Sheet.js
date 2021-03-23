@@ -11,38 +11,41 @@ const SheetRenderer = (props) => {
     <table className={props.className + " my-awesome-extra-class"}>
       <thead>
         <tr>
-          <th />
+          <th
+            style={{
+              background: "#f5f5f5",
+              border: "1px solid rgb(221, 221, 221)",
+            }}
+          />
           {new Array(dimensions.width).fill(undefined).map((col, index) => (
-            <th
+            <Resizable
               style={{
                 background: "#f5f5f5",
                 border: "1px solid rgb(221, 221, 221)",
               }}
+              enable={{
+                right: true,
+                bottom: false,
+                left: false,
+                topRight: false,
+                bottomRight: false,
+                bottomLeft: false,
+                topLeft: false,
+              }}
               key={colName(index)}
+              as="th"
             >
-              <Resizable
-                enable={{
-                  right: true,
-                  bottom: false,
-                  left: false,
-                  topRight: false,
-                  bottomRight: false,
-                  bottomLeft: false,
-                  topLeft: false,
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignContent: "center",
+                  height: "100%",
                 }}
               >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignContent: "center",
-                    height: "100%",
-                  }}
-                >
-                  {colName(index)}
-                </div>
-              </Resizable>
-            </th>
+                {colName(index)}
+              </div>
+            </Resizable>
           ))}
         </tr>
       </thead>
@@ -53,21 +56,24 @@ const SheetRenderer = (props) => {
 
 const RowRenderer = (props) => (
   <tr>
-    <td>
-      <Resizable
-        enable={{
-          right: false,
-          bottom: true,
-          left: false,
-          topRight: false,
-          bottomRight: false,
-          bottomLeft: false,
-          topLeft: false,
-        }}
-      >
-        {props.row}
-      </Resizable>
-    </td>
+    <Resizable
+      style={{
+        background: "#f5f5f5",
+        border: "1px solid rgb(221, 221, 221)",
+      }}
+      enable={{
+        right: false,
+        bottom: true,
+        left: false,
+        topRight: false,
+        bottomRight: false,
+        bottomLeft: false,
+        topLeft: false,
+      }}
+      as="td"
+    >
+      {props.row + 1}
+    </Resizable>
     {props.children}
   </tr>
 );
@@ -92,14 +98,16 @@ const Sheet = () => {
         attributesRenderer={(cell) => ({ colSpan: cell.colSpan || {} })}
       />
       {selected ? (
-        <>
+        <div style={{ display: "flex" }}>
           <div>
-            {selected.start.i}:{selected.start.j}
+            {colName(selected.start.j)}
+            {selected.start.i + 1}:
           </div>
           <div>
-            {selected.end.i}:{selected.end.j}
+            {colName(selected.end.j)}
+            {selected.end.i + 1}
           </div>
-        </>
+        </div>
       ) : null}
     </>
   );
